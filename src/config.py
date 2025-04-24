@@ -16,17 +16,10 @@ LANE_COLORS = [RED, GREEN, YELLOW, BLUE]
 LANE_WIDTH = 100
 
 KEY_BINDINGS = {
-<<<<<<< HEAD
-    'LANE_1': ['a', 'left'],
-    'LANE_2': ['s', 'down'],
-    'LANE_3': ['d', 'up'],
-    'LANE_4': ['f', 'right']
-=======
     'LANE_1': ['a'],
     'LANE_2': ['s'],
     'LANE_3': ['d'],
     'LANE_4': ['f']
->>>>>>> 6409d99 (update game ideia)
 }
 
 INITIAL_SPAWN_INTERVAL = 2.0

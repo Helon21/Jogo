@@ -6,11 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-<<<<<<< HEAD
-from world.objects import GameObject, create_hitbox, update_hitbox
-=======
 from src.world.game_object import GameObject, create_hitbox, update_hitbox
->>>>>>> 6409d99 (update game ideia)
 
 class Note(GameObject):
     

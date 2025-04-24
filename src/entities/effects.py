@@ -6,11 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-<<<<<<< HEAD
-from world.objects import GameObject
-=======
 from src.world.game_object import GameObject
->>>>>>> 6409d99 (update game ideia)
 
 class AnimatedEffect(GameObject):
     

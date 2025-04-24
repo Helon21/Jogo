@@ -6,11 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-<<<<<<< HEAD
-from scenes.guitar_hero import GuitarHeroScene
-=======
 from src.scenes.guitar_hero_scene import GuitarHeroScene
->>>>>>> 6409d99 (update game ideia)
 from config import *
 
 pygame.init()
