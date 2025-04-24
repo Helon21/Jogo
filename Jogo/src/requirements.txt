@@ -1,0 +1,7 @@
+<<<<<<< HEAD
+pygame==2.5.2
+
+
+=======
+pip install pygame
+>>>>>>> 6409d99 (update game ideia)
