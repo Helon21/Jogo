@@ -23,17 +23,20 @@ KEY_BINDINGS = {
 }
 
 INITIAL_SPAWN_INTERVAL = 2.0
-MIN_SPAWN_INTERVAL = 2.0
-SPAWN_INTERVAL_DECREASE = 0.0
-NOTE_SPEED = 200              
+MIN_SPAWN_INTERVAL = 1.0
+SPAWN_INTERVAL_INCREASE = 0.0
+NOTE_SPEED = 200
+MAX_NOTE_SPEED = 400
+NOTE_SPEED_INCREASE = 75
+DIFFICULTY_INTERVAL = 10
 
-BASE_SCORE = 100              
-MAX_MULTIPLIER = 6            
-COMBO_NEEDED = {             
-    1: 0,   
-    2: 8,    
-    3: 16,   
-    4: 24,   
-    5: 32,   
-    6: 40    
+BASE_SCORE = 100
+MAX_MULTIPLIER = 6
+COMBO_NEEDED = {
+    1: 0,
+    2: 8,
+    3: 16,
+    4: 24,
+    5: 32,
+    6: 40   
 }

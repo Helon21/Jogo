@@ -10,20 +10,13 @@ from objects.game_objects import GameObject, create_hitbox, update_hitbox
 
 class Note(GameObject):
     
-    def __init__(self, x, y, width, height, color, lane, speed):
+    def __init__(self, x, y, width, height, color, lane, speed, duration=0):
         super().__init__(x, y, width, height, color)
         self.lane = lane
         self.speed = speed
-        self.hitbox = create_hitbox(self)
-        self.hit = False
+        self.duration = duration
     
     def update(self, dt):
         if not self.hit and self.active:
             self.y += self.speed * dt
             super().update(dt)
-            update_hitbox(self.hitbox)
-    
-    def mark_as_hit(self):
-        self.hit = True
-        self.active = False
-        self.visible = False 

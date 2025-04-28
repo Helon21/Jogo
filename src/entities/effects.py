@@ -23,14 +23,11 @@ class AnimatedEffect(GameObject):
         self.current_time += dt
         if self.current_time >= self.duration:
             self.completed = True
-            self.visible = False
-            self.active = False
+            self.mark_as_hit()
         else:
             progress = self.current_time / self.duration
             self.width = self.width * (1 - progress)
             self.height = self.height * (1 - progress)
-            
             self.x = self.x + (progress * self.width / 2)
             self.y = self.y + (progress * self.height / 2)
-            
             super().update(dt) 

@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 import random
+import bisect
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -22,14 +23,11 @@ class GuitarHeroScene:
         self.max_combo = 0
         self.current_multiplier = 1
         
-        
         self.num_lanes = NUM_LANES
         self.lane_width = LANE_WIDTH
         self.lanes_start_x = (screen_width - (self.num_lanes * self.lane_width)) // 2
         
-        
         self.lane_colors = LANE_COLORS
-        
         
         self.key_bindings = [
             pygame.K_a,  
@@ -38,22 +36,31 @@ class GuitarHeroScene:
             pygame.K_f
         ]
         
-        
         self.button_height = 30
         self.buttons = []
         self.create_buttons()
         
-        
         self.notes = []
-        self.note_speed = NOTE_SPEED  
+        self.note_speed = NOTE_SPEED
         self.note_spawn_timer = 0
-        self.note_spawn_interval = INITIAL_SPAWN_INTERVAL  
-        
+        self.note_spawn_interval = INITIAL_SPAWN_INTERVAL
+        self.difficulty_timer = 0
+        self.difficulty_interval = DIFFICULTY_INTERVAL
         self.effects = []
         
         self.font = pygame.font.SysFont('Arial', 24)
         self.score_font = pygame.font.SysFont('Arial', 36)
         self.multiplier_font = pygame.font.SysFont('Arial', 48)
+        
+        self.song_start_time = None
+        self.music_loaded = False
+        self.music_path = 'src/audio/03_Sonne.mp3'
+        self.song_playing = False
+        self.in_burst = False
+        self.burst_lane = None
+        self.burst_notes_left = 0
+        self.burst_interval = 0.12
+        self.burst_timer = 0
     
     def create_buttons(self):
         button_y = self.screen_height - 100
@@ -70,18 +77,16 @@ class GuitarHeroScene:
             button.hitbox = create_hitbox(button)
             self.buttons.append(button)
     
-    def spawn_note(self):
-        lane = random.randint(0, self.num_lanes - 1)
-        
+    def spawn_note(self, lane=None):
+        if lane is None:
+            lane = random.randint(0, self.num_lanes - 1)
         x = self.lanes_start_x + (lane * self.lane_width) + (self.lane_width - 60) // 2
-        
         note = Note(
             x, 0, 60, 20, 
             self.lane_colors[lane],
             lane,
             self.note_speed
         )
-        
         self.notes.append(note)
     
     def create_hit_effect(self, x, y, color):
@@ -125,25 +130,66 @@ class GuitarHeroScene:
             if not hit:
                 self.combo = 0
                 self.current_multiplier = 1
-    
+
+    def start_song(self):
+        if not self.music_loaded:
+            try:
+                pygame.mixer.music.load(self.music_path)
+                pygame.mixer.music.play()
+                self.music_loaded = True
+                self.song_playing = True
+            except Exception as e:
+                print(f'Erro ao carregar música: {e}')
+        self.song_start_time = pygame.time.get_ticks() / 1000.0
+
     def update(self, dt):
-        self.note_spawn_timer += dt
-        if self.note_spawn_timer >= self.note_spawn_interval:
-            self.spawn_note()
-            self.note_spawn_timer = 0
+        if self.song_start_time is None:
+            self.start_song()
+            return
         
+        self.note_spawn_timer += dt
+        self.difficulty_timer += dt
+        # Lógica de bursts/sequências
+        if self.in_burst:
+            self.burst_timer += dt
+            if self.burst_timer >= self.burst_interval:
+                self.spawn_note(lane=self.burst_lane)
+                self.burst_notes_left -= 1
+                self.burst_timer = 0
+                if self.burst_notes_left <= 0:
+                    self.in_burst = False
+        else:
+            if self.note_spawn_timer >= self.note_spawn_interval:
+                # 15% de chance de iniciar um burst
+                if random.random() < 0.15:
+                    self.in_burst = True
+                    self.burst_lane = random.randint(0, self.num_lanes - 1)
+                    self.burst_notes_left = random.randint(2, 5)
+                    self.burst_timer = 0
+                    self.spawn_note(lane=self.burst_lane)  # Primeira nota do burst
+                    self.burst_notes_left -= 1
+                else:
+                    self.spawn_note()
+                self.note_spawn_timer = 0
+        if self.difficulty_timer >= DIFFICULTY_INTERVAL:
+            self.note_spawn_interval = max(
+                MIN_SPAWN_INTERVAL,
+                self.note_spawn_interval - SPAWN_INTERVAL_INCREASE
+            )
+            self.note_speed = min(
+                MAX_NOTE_SPEED,
+                self.note_speed + NOTE_SPEED_INCREASE
+            )
+            self.difficulty_timer = 0
         for button in self.buttons:
             update_hitbox(button.hitbox)
-        
         for note in self.notes[:]:
             note.update(dt)
-            
             if note.y > self.screen_height:
                 if not note.hit:
                     self.combo = 0
                     self.current_multiplier = 1
                 self.notes.remove(note)
-        
         for effect in self.effects[:]:
             effect.update(dt)
             if effect.completed:
