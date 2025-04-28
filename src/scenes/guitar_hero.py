@@ -1,13 +1,14 @@
 import pygame
 import sys
 import os
+import random
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from world.objects import GameObject, create_hitbox, update_hitbox, check_collision
+from Objects.game_objects import GameObject, create_hitbox, update_hitbox, check_collision
 from entities.note import Note
 from entities.effects import AnimatedEffect
 from config import *
@@ -71,11 +72,7 @@ class GuitarHeroScene:
             self.buttons.append(button)
     
     def spawn_note(self):
-        total_notes = len(self.notes)
-        if total_notes == 0:
-            lane = 0
-        else:
-            lane = (total_notes % self.num_lanes)
+        lane = random.randint(0, self.num_lanes - 1)
         
         x = self.lanes_start_x + (lane * self.lane_width) + (self.lane_width - 60) // 2
         
