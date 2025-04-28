@@ -6,8 +6,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from scenes.guitar_hero import GuitarHeroScene
-from Objects.game_objects import GameObject, create_hitbox, update_hitbox, check_collision, draw_hitbox
+from scenes.guitar_hero_scene import GuitarHeroScene
+from objects.game_objects import GameObject, create_hitbox, update_hitbox, check_collision, draw_hitbox
 from config import *
 
 pygame.init()
