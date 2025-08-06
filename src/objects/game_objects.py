@@ -1,8 +1,21 @@
 import pygame
 
+class SpriteManager:
+    def __init__(self, spritesheet_path):
+        self.spritesheet = pygame.image.load(spritesheet_path).convert_alpha()
+        self.sprites = {}
+    
+    def add_sprite(self, name, x, y, width, height):
+        sprite_surface = pygame.Surface((width, height), pygame.SRCALPHA)
+        sprite_surface.blit(self.spritesheet, (0, 0), (x, y, width, height))
+        self.sprites[name] = sprite_surface
+    
+    def get_sprite(self, name):
+        return self.sprites.get(name)
+
 class GameObject:
     
-    def __init__(self, x, y, width, height, color=(255, 255, 255)):
+    def __init__(self, x, y, width, height, color=(255, 255, 255), sprite_name=None, sprite_manager=None):
         self.x = x
         self.y = y
         self.width = width
@@ -13,6 +26,10 @@ class GameObject:
         self.active = True
         self.hitbox = self.create_hitbox()
         self.hit = False
+        
+        self.sprite_name = sprite_name
+        self.sprite_manager = sprite_manager
+        self.use_sprite = sprite_name is not None and sprite_manager is not None
     
     def update(self, dt):
         self.rect.x = self.x
@@ -21,7 +38,15 @@ class GameObject:
     
     def draw(self, surface):
         if self.visible:
-            pygame.draw.rect(surface, self.color, self.rect)
+            if self.use_sprite and self.sprite_name:
+                sprite = self.sprite_manager.get_sprite(self.sprite_name)
+                if sprite:
+                    scaled_sprite = pygame.transform.scale(sprite, (self.width, self.height))
+                    surface.blit(scaled_sprite, (self.x, self.y))
+                else:
+                    pygame.draw.rect(surface, self.color, self.rect)
+            else:
+                pygame.draw.rect(surface, self.color, self.rect)
     
     def set_position(self, x, y):
         self.x = x

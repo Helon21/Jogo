@@ -10,8 +10,8 @@ from objects.game_objects import GameObject, create_hitbox, update_hitbox
 
 class Note(GameObject):
     
-    def __init__(self, x, y, width, height, color, lane, speed, duration=0):
-        super().__init__(x, y, width, height, color)
+    def __init__(self, x, y, width, height, color, lane, speed, duration=0, sprite_name=None, sprite_manager=None):
+        super().__init__(x, y, width, height, color, sprite_name, sprite_manager)
         self.lane = lane
         self.speed = speed
         self.duration = duration

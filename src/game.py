@@ -32,6 +32,8 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         print("Tecla ESC pressionada")
                         self.running = False
+                if event.type == pygame.KEYUP:
+                    self.guitar_hero_scene.handle_key_release(event.key)
 
             self.guitar_hero_scene.update(dt)
             self.guitar_hero_scene.draw(self.screen)

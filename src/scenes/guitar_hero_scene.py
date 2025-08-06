@@ -8,9 +8,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from objects.game_objects import GameObject, create_hitbox, update_hitbox, check_collision
+from objects.game_objects import GameObject, create_hitbox, update_hitbox, check_collision, SpriteManager
 from entities.note import Note
-from entities.effects import AnimatedEffect
+from entities.effects import AnimatedEffect, FireEffect
 from config import *
 
 class GuitarHeroScene:
@@ -29,6 +29,15 @@ class GuitarHeroScene:
         
         self.lane_colors = LANE_COLORS
         
+        self.sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/guitarhero spritesheet.jpg')
+        self.setup_sprites()
+        
+        self.button_sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/spritesheet-note-buttons.jpg')
+        self.setup_button_sprites()
+        
+        self.background = pygame.image.load('src/scenes/spritesheet-background/Bocchi.png').convert_alpha()
+        self.background = pygame.transform.scale(self.background, (screen_width, screen_height))
+        
         self.key_bindings = [
             pygame.K_a,  
             pygame.K_s,  
@@ -38,6 +47,10 @@ class GuitarHeroScene:
         
         self.button_height = 30
         self.buttons = []
+        
+        self.button_states = [False] * NUM_LANES
+        self.pressed_keys = set()
+        
         self.create_buttons()
         
         self.notes = []
@@ -62,50 +75,108 @@ class GuitarHeroScene:
         self.burst_interval = 0.12
         self.burst_timer = 0
     
+    def setup_sprites(self):
+        self.sprite_manager.add_sprite('green_note', 3, 8, 43, 21)
+        self.sprite_manager.add_sprite('red_note', 47, 8, 43, 21)
+        self.sprite_manager.add_sprite('yellow_note', 92, 8, 43, 21)
+        self.sprite_manager.add_sprite('blue_note', 136, 8, 43, 21)
+    
+    def setup_button_sprites(self):
+        self.button_sprite_manager.add_sprite('red_button_idle', 61, 13, 51, 49)
+        self.button_sprite_manager.add_sprite('green_button_idle', 12, 14, 47, 48)
+        self.button_sprite_manager.add_sprite('yellow_button_idle', 115, 13, 49, 49)
+        self.button_sprite_manager.add_sprite('blue_button_idle', 167, 13, 48, 48)
+        
+        self.button_sprite_manager.add_sprite('red_button_pressed', 61, 67, 49, 47)
+        self.button_sprite_manager.add_sprite('green_button_pressed', 13, 67, 46, 48)
+        self.button_sprite_manager.add_sprite('yellow_button_pressed', 115, 68, 48, 47)
+        self.button_sprite_manager.add_sprite('blue_button_pressed', 167, 68, 48, 47)
+    
     def create_buttons(self):
         button_y = self.screen_height - 100
         
+        sprite_names = ['red_button_idle', 'green_button_idle', 'yellow_button_idle', 'blue_button_idle']
+        
         for i in range(self.num_lanes):
             x = self.lanes_start_x + (i * self.lane_width)
+            
             button = GameObject(
-                x + (self.lane_width - 80) // 2, 
+                x + (self.lane_width - 60) // 2,
                 button_y,
-                80,
-                self.button_height,
-                self.lane_colors[i]
+                60,
+                40,
+                self.lane_colors[i],
+                sprite_name=sprite_names[i],
+                sprite_manager=self.button_sprite_manager
             )
+            
             button.hitbox = create_hitbox(button)
             self.buttons.append(button)
     
     def spawn_note(self, lane=None):
         if lane is None:
             lane = random.randint(0, self.num_lanes - 1)
-        x = self.lanes_start_x + (lane * self.lane_width) + (self.lane_width - 60) // 2
+        x = self.lanes_start_x + (lane * self.lane_width) + (self.lane_width - 50) // 2
+        
+        sprite_names = ['red_note', 'green_note', 'yellow_note', 'blue_note']
+        
         note = Note(
-            x, 0, 60, 20, 
+            x, 0, 50, 30,
             self.lane_colors[lane],
             lane,
-            self.note_speed
+            self.note_speed,
+            sprite_name=sprite_names[lane],
+            sprite_manager=self.sprite_manager
         )
+        
         self.notes.append(note)
     
     def create_hit_effect(self, x, y, color):
-        effect = AnimatedEffect(
-            x - 40, y - 40,
-            80, 80,
-            0.3,
-            color
-        )
-        self.effects.append(effect)
+        lane_index = None
+        for i, button in enumerate(self.buttons):
+            if abs(x - (button.x + button.width/2)) < self.lane_width/2:
+                lane_index = i
+                break
+        
+        if lane_index is not None:
+            button = self.buttons[lane_index]
+            fire_x = button.x + (button.width - 60) // 2
+            fire_y = button.y - 80
+            
+            effect = FireEffect(
+                fire_x, fire_y,    
+                60, 80,
+                0.2
+            )
+            self.effects.append(effect)
     
     def get_current_multiplier(self):
         for multiplier in range(MAX_MULTIPLIER, 0, -1):
             if self.combo >= COMBO_NEEDED[multiplier]:
                 return multiplier
         return 1
+    
+    def set_button_state(self, lane_index, is_pressed):
+        if 0 <= lane_index < len(self.buttons):
+            self.button_states[lane_index] = is_pressed
+            button = self.buttons[lane_index]
+            
+            color_names = ['red', 'green', 'yellow', 'blue']
+            state_suffix = '_pressed' if is_pressed else '_idle'
+            sprite_name = f'{color_names[lane_index]}_button{state_suffix}'
+            
+            button.sprite_name = sprite_name
+    
+    def update_button_states(self):
+        """Atualiza os estados dos botões baseado nas teclas pressionadas"""
+        for i, key in enumerate(self.key_bindings):
+            is_pressed = key in self.pressed_keys
+            self.set_button_state(i, is_pressed)
 
     def handle_key_press(self, key):
         if key in self.key_bindings:
+            self.pressed_keys.add(key)
+            
             lane_index = self.key_bindings.index(key)
             button = self.buttons[lane_index]
             hit = False
@@ -130,6 +201,10 @@ class GuitarHeroScene:
             if not hit:
                 self.combo = 0
                 self.current_multiplier = 1
+    
+    def handle_key_release(self, key):
+        if key in self.key_bindings:
+            self.pressed_keys.discard(key)
 
     def start_song(self):
         if not self.music_loaded:
@@ -149,7 +224,6 @@ class GuitarHeroScene:
         
         self.note_spawn_timer += dt
         self.difficulty_timer += dt
-        # Lógica de bursts/sequências
         if self.in_burst:
             self.burst_timer += dt
             if self.burst_timer >= self.burst_interval:
@@ -160,13 +234,12 @@ class GuitarHeroScene:
                     self.in_burst = False
         else:
             if self.note_spawn_timer >= self.note_spawn_interval:
-                # 15% de chance de iniciar um burst
                 if random.random() < 0.15:
                     self.in_burst = True
                     self.burst_lane = random.randint(0, self.num_lanes - 1)
                     self.burst_notes_left = random.randint(2, 5)
                     self.burst_timer = 0
-                    self.spawn_note(lane=self.burst_lane)  # Primeira nota do burst
+                    self.spawn_note(lane=self.burst_lane)
                     self.burst_notes_left -= 1
                 else:
                     self.spawn_note()
@@ -181,6 +254,8 @@ class GuitarHeroScene:
                 self.note_speed + NOTE_SPEED_INCREASE
             )
             self.difficulty_timer = 0
+        self.update_button_states()
+        
         for button in self.buttons:
             update_hitbox(button.hitbox)
         for note in self.notes[:]:
@@ -196,15 +271,14 @@ class GuitarHeroScene:
                 self.effects.remove(effect)
     
     def draw(self, surface):
-        surface.fill(GRAY)
+        surface.blit(self.background, (0, 0))
         
         for i in range(self.num_lanes):
             x = self.lanes_start_x + (i * self.lane_width)
-            pygame.draw.rect(
-                surface,
-                tuple(c // 3 for c in self.lane_colors[i]),
-                (x, 0, self.lane_width, self.screen_height)
-            )
+            lane_surface = pygame.Surface((self.lane_width, self.screen_height), pygame.SRCALPHA)
+            lane_color = (*tuple(c // 3 for c in self.lane_colors[i]), 128)
+            lane_surface.fill(lane_color)
+            surface.blit(lane_surface, (x, 0))
         
         for button in self.buttons:
             button.draw(surface)
