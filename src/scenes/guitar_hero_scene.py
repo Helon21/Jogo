@@ -25,7 +25,7 @@ class GuitarHeroScene:
         
         self.num_lanes = NUM_LANES
         self.lane_width = LANE_WIDTH
-        self.lanes_start_x = (screen_width - (self.num_lanes * self.lane_width)) // 2
+        self.lanes_start_x = (screen_width - (self.num_lanes * self.lane_width)) // 2.3
         
         self.lane_colors = LANE_COLORS
         
@@ -236,7 +236,7 @@ class GuitarHeroScene:
                 if random.random() < 0.15:
                     self.in_burst = True
                     self.burst_lane = random.randint(0, self.num_lanes - 1)
-                    self.burst_notes_left = random.randint(2, 5)
+                    self.burst_notes_left = random.randint(2, 3)
                     self.burst_timer = 0
                     self.spawn_note(lane=self.burst_lane)
                     self.burst_notes_left -= 1

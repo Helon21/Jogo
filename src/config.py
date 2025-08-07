@@ -13,7 +13,7 @@ YELLOW = (255, 255, 0)
 
 NUM_LANES = 4
 LANE_COLORS = [RED, GREEN, YELLOW, BLUE]
-LANE_WIDTH = 100
+LANE_WIDTH = 110
 
 KEY_BINDINGS = {
     'LANE_1': ['a'],
@@ -34,9 +34,9 @@ BASE_SCORE = 100
 MAX_MULTIPLIER = 6
 COMBO_NEEDED = {
     1: 0,
-    2: 8,
-    3: 16,
-    4: 24,
-    5: 32,
-    6: 40   
+    2: 4,
+    3: 8,
+    4: 12,
+    5: 16,
+    6: 20   
 }
