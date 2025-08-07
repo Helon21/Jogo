@@ -29,10 +29,10 @@ class GuitarHeroScene:
         
         self.lane_colors = LANE_COLORS
         
-        self.sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/guitarhero spritesheet.jpg')
+        self.sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/guitarhero spritesheet.png')
         self.setup_sprites()
         
-        self.button_sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/spritesheet-note-buttons.jpg')
+        self.button_sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/spritesheet-note-buttons.png')
         self.setup_button_sprites()
         
         self.background = pygame.image.load('src/scenes/spritesheet-background/Bocchi.png').convert_alpha()
@@ -168,7 +168,6 @@ class GuitarHeroScene:
             button.sprite_name = sprite_name
     
     def update_button_states(self):
-        """Atualiza os estados dos botões baseado nas teclas pressionadas"""
         for i, key in enumerate(self.key_bindings):
             is_pressed = key in self.pressed_keys
             self.set_button_state(i, is_pressed)

@@ -38,7 +38,7 @@ class FireEffect(GameObject):
     def __init__(self, x, y, width, height, duration=0.8):
         super().__init__(x, y, width, height)
         
-        self.fire_sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/fire-note.jpg')
+        self.fire_sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/fire-note.png')
         self.setup_fire_sprites()
         
         self.duration = duration
