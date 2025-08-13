@@ -74,6 +74,11 @@ class GuitarHeroScene:
         self.burst_notes_left = 0
         self.burst_interval = 0.12
         self.burst_timer = 0
+        
+        self.multi_lane_spawn = False
+        self.multi_lane_notes = []
+        self.multi_lane_timer = 0
+        self.multi_lane_interval = 0.2
     
     def setup_sprites(self):
         self.sprite_manager.add_sprite('green_note', 3, 8, 43, 21)
@@ -240,9 +245,27 @@ class GuitarHeroScene:
                     self.burst_timer = 0
                     self.spawn_note(lane=self.burst_lane)
                     self.burst_notes_left -= 1
+                elif random.random() < 0.3 and not self.multi_lane_spawn:
+                    num_lanes = random.randint(2, 3)
+                    available_lanes = list(range(self.num_lanes))
+                    random.shuffle(available_lanes)
+                    self.multi_lane_spawn = True
+                    self.multi_lane_notes = available_lanes[:num_lanes]
+                    self.multi_lane_timer = 0
+                    self.spawn_note(lane=self.multi_lane_notes.pop(0))
                 else:
                     self.spawn_note()
                 self.note_spawn_timer = 0
+
+        if self.multi_lane_spawn:
+            self.multi_lane_timer += dt
+            if self.multi_lane_timer >= self.multi_lane_interval:
+                if self.multi_lane_notes:
+                    self.spawn_note(lane=self.multi_lane_notes.pop(0))
+                    self.multi_lane_timer = 0
+                else:
+                    self.multi_lane_spawn = False
+
         if self.difficulty_timer >= DIFFICULTY_INTERVAL:
             self.note_spawn_interval = max(
                 MIN_SPAWN_INTERVAL,
