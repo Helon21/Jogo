@@ -5,7 +5,6 @@ import random
 import bisect
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from objects.game_objects import GameObject, create_hitbox, update_hitbox, check_collision, SpriteManager
@@ -69,6 +68,7 @@ class GuitarHeroScene:
         self.music_loaded = False
         self.music_path = 'src/audio/03_Sonne.mp3'
         self.song_playing = False
+        self.music_volume = 0.4
         self.in_burst = False
         self.burst_lane = None
         self.burst_notes_left = 0
@@ -79,6 +79,54 @@ class GuitarHeroScene:
         self.multi_lane_notes = []
         self.multi_lane_timer = 0
         self.multi_lane_interval = 0.2
+        
+        self.error_sound = None
+        self.error_sound_timer = 0
+        self.error_sound_duration = 0.2
+        self.is_playing_error_sound = False
+        self.load_error_sound()
+        
+        self.hit_sound = None
+        self.hit_sound_timer = 0
+        self.hit_sound_duration = 0.15
+        self.is_playing_hit_sound = False
+        self.load_hit_sound()
+    
+    def load_error_sound(self):
+        try:
+            self.error_sound = pygame.mixer.Sound('src/audio/missing-note-guitarhero.mp3')
+            self.error_sound.set_volume(0.8)
+        except Exception as e:
+            print(f'Erro ao carregar som de erro: {e}')
+            self.error_sound = None
+    
+    def load_hit_sound(self):
+        try:
+            self.hit_sound = pygame.mixer.Sound('src/audio/hit-note.mp3')
+            self.hit_sound.set_volume(0.8)
+        except Exception as e:
+            print(f'Erro ao carregar som de acerto: {e}')
+            self.hit_sound = None
+    
+    def play_error_sound(self):
+        if self.error_sound and not self.is_playing_error_sound:
+            try:
+                self.error_sound.stop()
+                self.error_sound.play()
+                self.is_playing_error_sound = True
+                self.error_sound_timer = 0
+            except Exception as e:
+                print(f'Erro ao tocar som de erro: {e}')
+    
+    def play_hit_sound(self):
+        if self.hit_sound and not self.is_playing_hit_sound:
+            try:
+                self.hit_sound.stop()
+                self.hit_sound.play()
+                self.is_playing_hit_sound = True
+                self.hit_sound_timer = 0
+            except Exception as e:
+                print(f'Erro ao tocar som de acerto: {e}')
     
     def setup_sprites(self):
         self.sprite_manager.add_sprite('green_note', 3, 8, 43, 21)
@@ -145,15 +193,19 @@ class GuitarHeroScene:
         
         if lane_index is not None:
             button = self.buttons[lane_index]
-            fire_x = button.x + (button.width - 60) // 2
-            fire_y = button.y - 80
+            effect_width = 80
+            effect_height = int(effect_width / 0.72)
+            fire_x = button.x + (button.width - effect_width) // 2
+            fire_y = button.y - effect_height // 1.3
             
             effect = FireEffect(
-                fire_x, fire_y,    
-                60, 80,
-                0.2
+                fire_x, fire_y,
+                effect_width, effect_height,
+                0.6
             )
             self.effects.append(effect)
+            
+            self.play_hit_sound()
     
     def get_current_multiplier(self):
         for multiplier in range(MAX_MULTIPLIER, 0, -1):
@@ -205,6 +257,7 @@ class GuitarHeroScene:
             if not hit:
                 self.combo = 0
                 self.current_multiplier = 1
+                self.play_error_sound()
     
     def handle_key_release(self, key):
         if key in self.key_bindings:
@@ -214,6 +267,7 @@ class GuitarHeroScene:
         if not self.music_loaded:
             try:
                 pygame.mixer.music.load(self.music_path)
+                pygame.mixer.music.set_volume(self.music_volume)
                 pygame.mixer.music.play()
                 self.music_loaded = True
                 self.song_playing = True
@@ -278,6 +332,20 @@ class GuitarHeroScene:
             self.difficulty_timer = 0
         self.update_button_states()
         
+        if self.is_playing_error_sound:
+            self.error_sound_timer += dt
+            if self.error_sound_timer >= self.error_sound_duration:
+                if self.error_sound:
+                    self.error_sound.stop()
+                self.is_playing_error_sound = False
+        
+        if self.is_playing_hit_sound:
+            self.hit_sound_timer += dt
+            if self.hit_sound_timer >= self.hit_sound_duration:
+                if self.hit_sound:
+                    self.hit_sound.stop()
+                self.is_playing_hit_sound = False
+        
         for button in self.buttons:
             update_hitbox(button.hitbox)
         for note in self.notes[:]:
@@ -286,6 +354,7 @@ class GuitarHeroScene:
                 if not note.hit:
                     self.combo = 0
                     self.current_multiplier = 1
+                    self.play_error_sound()
                 self.notes.remove(note)
         for effect in self.effects[:]:
             effect.update(dt)
