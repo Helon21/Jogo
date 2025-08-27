@@ -1,4 +1,55 @@
 import pygame
+import random
+import os
+
+class RandomMediaSelector:
+    def __init__(self, audio_files, background_images):
+        self.audio_files = audio_files
+        self.background_images = background_images
+        self.current_audio = None
+        self.current_background = None
+        
+    def select_random_audio(self):
+        if self.audio_files:
+            self.current_audio = random.choice(self.audio_files)
+            return self.current_audio
+        return None
+    
+    def select_random_background(self):
+        if self.background_images:
+            self.current_background = random.choice(self.background_images)
+            return self.current_background
+        return None
+    
+    def get_current_audio(self):
+        """Retorna a música atualmente selecionada"""
+        return self.current_audio
+    
+    def get_current_background(self):
+        """Retorna o background atualmente selecionado"""
+        return self.current_background
+    
+    def validate_files(self):
+        """Valida se os arquivos existem e retorna apenas os válidos"""
+        valid_audio = []
+        valid_backgrounds = []
+        
+        for audio_file in self.audio_files:
+            if os.path.exists(audio_file):
+                valid_audio.append(audio_file)
+            else:
+                print(f"Arquivo de áudio não encontrado: {audio_file}")
+        
+        for bg_file in self.background_images:
+            if os.path.exists(bg_file):
+                valid_backgrounds.append(bg_file)
+            else:
+                print(f"Arquivo de background não encontrado: {bg_file}")
+        
+        self.audio_files = valid_audio
+        self.background_images = valid_backgrounds
+        
+        return len(valid_audio) > 0, len(valid_backgrounds) > 0
 
 class SpriteManager:
     def __init__(self, spritesheet_path):

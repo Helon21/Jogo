@@ -22,6 +22,32 @@ KEY_BINDINGS = {
     'LANE_4': ['f']
 }
 
+AUDIO_FILES = [
+    'src/audio/03_Sonne.mp3',
+    'src/audio/2 minutes to midnight.mp3',
+    'src/audio/Before I forget.mp3',
+    'src/audio/carry on my wayward son.mp3',
+    'src/audio/Hail to the king.mp3',
+    'src/audio/King for a day.mp3',
+    'src/audio/Its my life.mp3',
+    'src/audio/Livin on a prayer.mp3',
+    'src/audio/Knights of Cydonia.mp3',
+    'src/audio/Seven Nation.mp3',
+
+]
+
+BACKGROUND_IMAGES = [
+    'src/scenes/spritesheet-background/akame-tatsumi.png',
+    'src/scenes/spritesheet-background/spice-and-wolf.png',
+    'src/scenes/spritesheet-background/fate.png',
+    'src/scenes/spritesheet-background/Bocchi.png',
+    'src/scenes/spritesheet-background/morgiana-alibaba.png',
+    'src/scenes/spritesheet-background/Hinata-Naruto.png',
+    'src/scenes/spritesheet-background/Zoro-nami.png',
+    'src/scenes/spritesheet-background/kimetsu.png',
+    'src/scenes/spritesheet-background/Winry-edward.png',
+]
+
 INITIAL_SPAWN_INTERVAL = 2.0
 MIN_SPAWN_INTERVAL = 1.0
 SPAWN_INTERVAL_INCREASE = 0.0

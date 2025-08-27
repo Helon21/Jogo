@@ -7,7 +7,7 @@ import bisect
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from objects.game_objects import GameObject, create_hitbox, update_hitbox, check_collision, SpriteManager
+from objects.game_objects import GameObject, create_hitbox, update_hitbox, check_collision, SpriteManager, RandomMediaSelector
 from entities.note import Note
 from entities.effects import AnimatedEffect, FireEffect
 from config import *
@@ -28,14 +28,24 @@ class GuitarHeroScene:
         
         self.lane_colors = LANE_COLORS
         
+        self.media_selector = RandomMediaSelector(AUDIO_FILES, BACKGROUND_IMAGES)
+        self.media_selector.validate_files()
+        
         self.sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/guitarhero spritesheet.png')
         self.setup_sprites()
         
         self.button_sprite_manager = SpriteManager('src/scenes/sprite-sheet-notes/spritesheet-note-buttons.png')
         self.setup_button_sprites()
         
-        self.background = pygame.image.load('src/scenes/spritesheet-background/Bocchi.png').convert_alpha()
-        self.background = pygame.transform.scale(self.background, (screen_width, screen_height))
+        self.background_path = self.media_selector.select_random_background()
+        if self.background_path:
+            self.background = pygame.image.load(self.background_path).convert_alpha()
+            self.background = pygame.transform.scale(self.background, (screen_width, screen_height))
+            print(f"Background selecionado: {os.path.basename(self.background_path)}")
+        else:
+            self.background = pygame.Surface((screen_width, screen_height))
+            self.background.fill(BLACK)
+            print("Nenhum background válido encontrado, usando padrão")
         
         self.key_bindings = [
             pygame.K_a,  
@@ -66,7 +76,7 @@ class GuitarHeroScene:
         
         self.song_start_time = None
         self.music_loaded = False
-        self.music_path = 'src/audio/03_Sonne.mp3'
+        self.music_path = self.media_selector.select_random_audio()
         self.song_playing = False
         self.music_volume = 0.4
         self.in_burst = False
@@ -91,6 +101,11 @@ class GuitarHeroScene:
         self.hit_sound_duration = 0.15
         self.is_playing_hit_sound = False
         self.load_hit_sound()
+        
+        if self.music_path:
+            print(f"Música selecionada: {os.path.basename(self.music_path)}")
+        else:
+            print("Nenhuma música válida encontrada")
     
     def load_error_sound(self):
         try:
@@ -264,15 +279,27 @@ class GuitarHeroScene:
             self.pressed_keys.discard(key)
 
     def start_song(self):
-        if not self.music_loaded:
+        if not self.music_loaded and self.music_path:
             try:
                 pygame.mixer.music.load(self.music_path)
                 pygame.mixer.music.set_volume(self.music_volume)
                 pygame.mixer.music.play()
                 self.music_loaded = True
                 self.song_playing = True
+                print(f"Reproduzindo música: {os.path.basename(self.music_path)}")
             except Exception as e:
                 print(f'Erro ao carregar música: {e}')
+                self.music_path = self.media_selector.select_random_audio()
+                if self.music_path:
+                    print(f"Tentando música alternativa: {os.path.basename(self.music_path)}")
+                    try:
+                        pygame.mixer.music.load(self.music_path)
+                        pygame.mixer.music.set_volume(self.music_volume)
+                        pygame.mixer.music.play()
+                        self.music_loaded = True
+                        self.song_playing = True
+                    except Exception as e2:
+                        print(f'Erro ao carregar música alternativa: {e2}')
         self.song_start_time = pygame.time.get_ticks() / 1000.0
 
     def update(self, dt):
@@ -388,6 +415,16 @@ class GuitarHeroScene:
         
         max_combo_text = self.font.render(f"Combo Max: {self.max_combo}", True, WHITE)
         surface.blit(max_combo_text, (20, 100))
+        
+        if self.music_path:
+            music_name = os.path.basename(self.music_path).replace('.mp3', '')
+            music_text = self.font.render(f"Música: {music_name}", True, WHITE)
+            surface.blit(music_text, (20, 130))
+        
+        if self.background_path:
+            bg_name = os.path.basename(self.background_path).replace('.png', '')
+            bg_text = self.font.render(f"Background: {bg_name}", True, WHITE)
+            surface.blit(bg_text, (20, 160))
         
         multiplier_color = (255, 255, 0)  
         if self.current_multiplier >= 4:
