@@ -23,7 +23,7 @@ KEY_BINDINGS = {
 }
 
 AUDIO_FILES = [
-    'src/audio/03_Sonne.mp3',
+    'src/audio/Sonne.mp3',
     'src/audio/2 minutes to midnight.mp3',
     'src/audio/Before I forget.mp3',
     'src/audio/carry on my wayward son.mp3',
@@ -33,7 +33,19 @@ AUDIO_FILES = [
     'src/audio/Livin on a prayer.mp3',
     'src/audio/Knights of Cydonia.mp3',
     'src/audio/Seven Nation.mp3',
-
+    'src/audio/duality.mp3',
+    'src/audio/AC⚡️DC - Hells Bells.mp3',
+    'src/audio/AC DC - Back In Black.mp3',
+    'src/audio/Disturbed - Stricken.mp3',
+    'src/audio/Europe - The Final Countdown.mp3',
+    'src/audio/Iron Maiden - Run To The Hills.mp3',
+    'src/audio/Kiss - Rock and Roll All Nite.mp3',
+    'src/audio/Linkin Park - In the End.mp3',
+    'src/audio/Linkin Park - Numb.mp3',
+    'src/audio/Rammstein - Amerika.mp3',
+    'Panzerkampf (Cover).mp3',
+    'src/audio/Scorpions - Rock You Like A Hurricane.mp3',
+    'src/audio/Scorpions - Wind Of Change.mp3'
 ]
 
 BACKGROUND_IMAGES = [
@@ -41,11 +53,11 @@ BACKGROUND_IMAGES = [
     'src/scenes/spritesheet-background/spice-and-wolf.png',
     'src/scenes/spritesheet-background/fate.png',
     'src/scenes/spritesheet-background/Bocchi.png',
-    'src/scenes/spritesheet-background/morgiana-alibaba.png',
-    'src/scenes/spritesheet-background/Hinata-Naruto.png',
-    'src/scenes/spritesheet-background/Zoro-nami.png',
+    'src/scenes/spritesheet-background/Magi.png',
+    'src/scenes/spritesheet-background/Naruto.png',
+    'src/scenes/spritesheet-background/OnePiece.png',
     'src/scenes/spritesheet-background/kimetsu.png',
-    'src/scenes/spritesheet-background/Winry-edward.png',
+    'src/scenes/spritesheet-background/FullMetalAlchemist.png',
 ]
 
 INITIAL_SPAWN_INTERVAL = 2.0
