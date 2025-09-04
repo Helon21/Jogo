@@ -45,7 +45,18 @@ AUDIO_FILES = [
     'src/audio/Rammstein - Amerika.mp3',
     'Panzerkampf (Cover).mp3',
     'src/audio/Scorpions - Rock You Like A Hurricane.mp3',
-    'src/audio/Scorpions - Wind Of Change.mp3'
+    'src/audio/Scorpions - Wind Of Change.mp3',
+    'src/audio/Breaking the Habit.mp3',
+    'src/audio/Nirvana - Smells Like Teen Spirit.mp3',
+    'src/audio/Three Days Grace - I Hate Everything About You.mp3',
+    'src/audio/Daft Punk - Get Lucky.mp3',
+    'src/audio/Metallica： Master of Puppets.mp3',
+    'src/audio/Guns N Roses - Sweet Child O Mine.mp3',
+    'src/audio/Meg & Dia - Monster.mp3',
+    'src/audio/Evanescence - Everybodys Fool.mp3',
+    'src/audio/Guns N Roses - Paradise City .mp3',
+    'src/audio/Crawling - Linkin Park.mp3',
+    'src/audio/The Emptiness Machine - Linkin Park.mp3'
 ]
 
 BACKGROUND_IMAGES = [
