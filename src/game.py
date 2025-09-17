@@ -1,6 +1,7 @@
 import pygame
 import sys
 from scenes.guitar_hero_scene import GuitarHeroScene
+from scenes.menu import MenuScene
 from config import *
 
 class Game:
@@ -10,9 +11,14 @@ class Game:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
-        print("Criando cena Guitar Hero...")
-        self.guitar_hero_scene = GuitarHeroScene(SCREEN_WIDTH, SCREEN_HEIGHT)
+        
+        self.current_scene = "menu"
         self.running = True
+        
+        print("Criando cena do menu...")
+        self.menu_scene = MenuScene(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.guitar_hero_scene = None
+        
         print("Jogo inicializado com sucesso!")
 
     def run(self):
@@ -27,18 +33,83 @@ class Game:
                 if event.type == pygame.QUIT:
                     print("Evento QUIT detectado")
                     self.running = False
-                if event.type == pygame.KEYDOWN:
-                    self.guitar_hero_scene.handle_key_press(event.key)
-                    if event.key == pygame.K_ESCAPE:
-                        print("Tecla ESC pressionada")
-                        self.running = False
-                if event.type == pygame.KEYUP:
-                    self.guitar_hero_scene.handle_key_release(event.key)
+                
+                elif event.type == pygame.KEYDOWN:
+                    self.handle_key_press(event.key)
+                
+                elif event.type == pygame.KEYUP:
+                    if self.current_scene == "game" and self.guitar_hero_scene:
+                        self.guitar_hero_scene.handle_key_release(event.key)
+                
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        self.handle_mouse_click(event.pos)
 
-            self.guitar_hero_scene.update(dt)
-            self.guitar_hero_scene.draw(self.screen)
+            self.update(dt)
+            self.draw()
             pygame.display.flip()
             self.clock.tick(FPS)
+        
         print("Encerrando o jogo...")
         pygame.quit()
-        sys.exit() 
+        sys.exit()
+    
+    def handle_key_press(self, key):
+        if self.current_scene == "menu":
+            action = self.menu_scene.handle_key_press(key)
+            if action == "start_game":
+                self.start_game()
+            elif action == "exit_game":
+                self.running = False
+        
+        elif self.current_scene == "game":
+            if self.guitar_hero_scene:
+                self.guitar_hero_scene.handle_key_press(key)
+                if key == pygame.K_ESCAPE:
+                    print("Voltando ao menu...")
+                    self.return_to_menu()
+    
+    def handle_mouse_click(self, mouse_pos):
+        if self.current_scene == "menu":
+            action = self.menu_scene.handle_mouse_click(mouse_pos)
+            if action == "start_game":
+                self.start_game()
+            elif action == "exit_game":
+                self.running = False
+    
+    def start_game(self):
+        print("Iniciando o jogo...")
+        selected_music = self.menu_scene.get_selected_music()
+        
+        pygame.mixer.music.stop()
+        
+        self.guitar_hero_scene = GuitarHeroScene(SCREEN_WIDTH, SCREEN_HEIGHT)
+        
+        if selected_music:
+            self.guitar_hero_scene.music_path = selected_music
+            print(f"Música selecionada: {selected_music}")
+        
+        self.current_scene = "game"
+    
+    def return_to_menu(self):
+        print("Retornando ao menu...")
+        pygame.mixer.music.stop()
+        
+        self.guitar_hero_scene = None
+        
+        self.current_scene = "menu"
+    
+    def update(self, dt):
+        if self.current_scene == "menu":
+            self.menu_scene.update(dt)
+        elif self.current_scene == "game" and self.guitar_hero_scene:
+            result = self.guitar_hero_scene.update(dt)
+            if result == "return_to_menu":
+                print("Retornando ao menu após música finalizada...")
+                self.return_to_menu()
+    
+    def draw(self):
+        if self.current_scene == "menu":
+            self.menu_scene.draw(self.screen)
+        elif self.current_scene == "game" and self.guitar_hero_scene:
+            self.guitar_hero_scene.draw(self.screen) 

@@ -1,7 +1,7 @@
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 FPS = 60
-TITLE = "Guitar Hero"
+TITLE = "Guitar Hero - Anime Edition"
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -43,7 +43,7 @@ AUDIO_FILES = [
     'src/audio/Linkin Park - In the End.mp3',
     'src/audio/Linkin Park - Numb.mp3',
     'src/audio/Rammstein - Amerika.mp3',
-    'Panzerkampf (Cover).mp3',
+    'src/audio/Panzerkampf (Cover).mp3',
     'src/audio/Scorpions - Rock You Like A Hurricane.mp3',
     'src/audio/Scorpions - Wind Of Change.mp3',
     'src/audio/Breaking the Habit.mp3',
@@ -89,3 +89,11 @@ COMBO_NEEDED = {
     5: 16,
     6: 20   
 }
+
+MENU_TITLE_SIZE = 72
+MENU_BUTTON_FONT_SIZE = 32
+MENU_MUSIC_FONT_SIZE = 20
+MENU_INSTRUCTION_FONT_SIZE = 16
+
+MENU_BUTTON_HOVER_GREEN = (0, 200, 0)
+MENU_BUTTON_HOVER_RED = (200, 0, 0)
