@@ -22,15 +22,12 @@ class RandomMediaSelector:
         return None
     
     def get_current_audio(self):
-        """Retorna a música atualmente selecionada"""
         return self.current_audio
     
     def get_current_background(self):
-        """Retorna o background atualmente selecionado"""
         return self.current_background
     
     def validate_files(self):
-        """Valida se os arquivos existem e retorna apenas os válidos"""
         valid_audio = []
         valid_backgrounds = []
         

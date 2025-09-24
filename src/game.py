@@ -2,6 +2,7 @@ import pygame
 import sys
 from scenes.guitar_hero_scene import GuitarHeroScene
 from scenes.menu import MenuScene
+from scenes.score_menu import ScoreMenuScene
 from config import *
 
 class Game:
@@ -18,6 +19,7 @@ class Game:
         print("Criando cena do menu...")
         self.menu_scene = MenuScene(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.guitar_hero_scene = None
+        self.score_menu_scene = None
         
         print("Jogo inicializado com sucesso!")
 
@@ -68,7 +70,13 @@ class Game:
                 if key == pygame.K_ESCAPE:
                     print("Voltando ao menu...")
                     self.return_to_menu()
-    
+        
+        elif self.current_scene == "score":
+            if self.score_menu_scene:
+                action = self.score_menu_scene.handle_key_press(key)
+                if action == "return_to_menu":
+                    self.return_to_menu()
+
     def handle_mouse_click(self, mouse_pos):
         if self.current_scene == "menu":
             action = self.menu_scene.handle_mouse_click(mouse_pos)
@@ -96,8 +104,14 @@ class Game:
         pygame.mixer.music.stop()
         
         self.guitar_hero_scene = None
+        self.score_menu_scene = None
         
         self.current_scene = "menu"
+    
+    def show_score_menu(self, song_name, final_score):
+        print("Mostrando menu de pontuação...")
+        self.score_menu_scene = ScoreMenuScene(SCREEN_WIDTH, SCREEN_HEIGHT, song_name, final_score)
+        self.current_scene = "score"
     
     def update(self, dt):
         if self.current_scene == "menu":
@@ -105,11 +119,17 @@ class Game:
         elif self.current_scene == "game" and self.guitar_hero_scene:
             result = self.guitar_hero_scene.update(dt)
             if result == "return_to_menu":
-                print("Retornando ao menu após música finalizada...")
-                self.return_to_menu()
+                print("Música finalizada, mostrando pontuação...")
+                song_name = self.guitar_hero_scene.music_path.split('/')[-1].replace('.mp3', '')
+                final_score = self.guitar_hero_scene.score
+                self.show_score_menu(song_name, final_score)
+        elif self.current_scene == "score" and self.score_menu_scene:
+            self.score_menu_scene.update(dt)
     
     def draw(self):
         if self.current_scene == "menu":
             self.menu_scene.draw(self.screen)
         elif self.current_scene == "game" and self.guitar_hero_scene:
-            self.guitar_hero_scene.draw(self.screen) 
+            self.guitar_hero_scene.draw(self.screen)
+        elif self.current_scene == "score" and self.score_menu_scene:
+            self.score_menu_scene.draw(self.screen)
