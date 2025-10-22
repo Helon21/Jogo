@@ -189,9 +189,20 @@ class MenuScene:
             self.button_font
         )
         
-        self.exit_button = MenuButton(
+        self.credits_button = MenuButton(
             screen_width // 2 - button_width // 2,
             start_y + button_spacing,
+            button_width,
+            button_height,
+            "CRÉDITOS",
+            BLUE,
+            (0, 150, 255),
+            self.button_font
+        )
+        
+        self.exit_button = MenuButton(
+            screen_width // 2 - button_width // 2,
+            start_y + button_spacing * 2,
             button_width,
             button_height,
             "SAIR",
@@ -204,7 +215,7 @@ class MenuScene:
         selector_height = 220
         self.music_selector = MusicSelector(
             screen_width // 2 - selector_width // 2,
-            start_y + button_spacing * 2 + 20,
+            start_y + button_spacing * 3 + 20,
             selector_width,
             selector_height,
             AUDIO_FILES,
@@ -214,6 +225,7 @@ class MenuScene:
         self.instructions = [
             "Use as setas ↑↓ para navegar pelas músicas",
             "Pressione ENTER para iniciar o jogo",
+            "Pressione C para ver os créditos",
             "Pressione ESC para sair"
         ]
         
@@ -230,6 +242,9 @@ class MenuScene:
         elif key == pygame.K_ESCAPE:
             return "exit_game"
         
+        elif key == pygame.K_c:
+            return "show_credits"
+        
         elif key == pygame.K_UP:
             self.music_selector.scroll_up()
         
@@ -243,6 +258,9 @@ class MenuScene:
             self.selected_music = self.music_selector.get_selected_music()
             return "start_game"
         
+        elif self.credits_button.rect.collidepoint(mouse_pos):
+            return "show_credits"
+        
         elif self.exit_button.rect.collidepoint(mouse_pos):
             return "exit_game"
         
@@ -250,10 +268,12 @@ class MenuScene:
     
     def update(self, dt):
         self.start_button.update(dt)
+        self.credits_button.update(dt)
         self.exit_button.update(dt)
         
         mouse_pos = pygame.mouse.get_pos()
         self.start_button.check_hover(mouse_pos)
+        self.credits_button.check_hover(mouse_pos)
         self.exit_button.check_hover(mouse_pos)
     
     def draw(self, surface):
@@ -269,6 +289,7 @@ class MenuScene:
         surface.blit(self.title_text, self.title_rect)
         
         self.start_button.draw(surface)
+        self.credits_button.draw(surface)
         self.exit_button.draw(surface)
         
         if self.show_music_selector:

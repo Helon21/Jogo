@@ -3,6 +3,7 @@ import sys
 from scenes.guitar_hero_scene import GuitarHeroScene
 from scenes.menu import MenuScene
 from scenes.score_menu import ScoreMenuScene
+from scenes.credits import CreditsScene
 from config import *
 
 class Game:
@@ -20,6 +21,7 @@ class Game:
         self.menu_scene = MenuScene(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.guitar_hero_scene = None
         self.score_menu_scene = None
+        self.credits_scene = None
         
         print("Jogo inicializado com sucesso!")
 
@@ -76,6 +78,12 @@ class Game:
                 action = self.score_menu_scene.handle_key_press(key)
                 if action == "return_to_menu":
                     self.return_to_menu()
+        
+        elif self.current_scene == "credits":
+            if self.credits_scene:
+                action = self.credits_scene.handle_key_press(key)
+                if action == "return_to_menu":
+                    self.return_to_menu()
 
     def handle_mouse_click(self, mouse_pos):
         if self.current_scene == "menu":
@@ -84,6 +92,14 @@ class Game:
                 self.start_game()
             elif action == "exit_game":
                 self.running = False
+            elif action == "show_credits":
+                self.show_credits()
+        
+        elif self.current_scene == "credits":
+            if self.credits_scene:
+                action = self.credits_scene.handle_mouse_click(mouse_pos)
+                if action == "return_to_menu":
+                    self.return_to_menu()
     
     def start_game(self):
         print("Iniciando o jogo...")
@@ -105,8 +121,14 @@ class Game:
         
         self.guitar_hero_scene = None
         self.score_menu_scene = None
+        self.credits_scene = None
         
         self.current_scene = "menu"
+    
+    def show_credits(self):
+        print("Mostrando créditos...")
+        self.credits_scene = CreditsScene(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.current_scene = "credits"
     
     def show_score_menu(self, song_name, final_score):
         print("Mostrando menu de pontuação...")
@@ -125,6 +147,10 @@ class Game:
                 self.show_score_menu(song_name, final_score)
         elif self.current_scene == "score" and self.score_menu_scene:
             self.score_menu_scene.update(dt)
+        elif self.current_scene == "credits" and self.credits_scene:
+            result = self.credits_scene.update(dt)
+            if result == "return_to_menu":
+                self.return_to_menu()
     
     def draw(self):
         if self.current_scene == "menu":
@@ -133,3 +159,5 @@ class Game:
             self.guitar_hero_scene.draw(self.screen)
         elif self.current_scene == "score" and self.score_menu_scene:
             self.score_menu_scene.draw(self.screen)
+        elif self.current_scene == "credits" and self.credits_scene:
+            self.credits_scene.draw(self.screen)
