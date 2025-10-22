@@ -28,17 +28,13 @@ class GIFPlayer:
             self.loaded = False
     
     def load_gif(self):
-        """Carrega o GIF e extrai todos os frames"""
         try:
-            # Abrir o GIF com PIL
             pil_image = Image.open(self.gif_path)
             
-            # Extrair todos os frames
             frames = []
             durations = []
             
             for frame in ImageSequence.Iterator(pil_image):
-                # Converter PIL Image para pygame Surface
                 frame_rgba = frame.convert('RGBA')
                 frame_data = frame_rgba.tobytes()
                 frame_size = frame_rgba.size
@@ -128,7 +124,6 @@ class CreditsScene:
         self.screen_width = screen_width
         self.screen_height = screen_height
         
-        # Fontes
         self.title_font = pygame.font.SysFont('Arial', 48, bold=True)
         self.subtitle_font = pygame.font.SysFont('Arial', 32, bold=True)
         self.text_font = pygame.font.SysFont('Arial', 24)
@@ -149,16 +144,14 @@ class CreditsScene:
             ("", self.text_font, WHITE),
             ("Criado utilizando Python e Pygame", self.text_font, WHITE),
             ("", self.text_font, WHITE),
-            ("Supervisionado pelo Professor Eduardo", self.text_font, WHITE),
+            ("Orientado pelo Professor Eduardo", self.subtitle_font, YELLOW),
             ("", self.text_font, WHITE),
             ("Criado por Helon Xavier", self.subtitle_font, YELLOW),
             ("", self.text_font, WHITE),
             ("", self.text_font, WHITE),
             ("Obrigado por jogar!", self.subtitle_font, GREEN),
             ("", self.text_font, WHITE),
-            ("", self.text_font, WHITE),
-            ("", self.text_font, WHITE),
-            ("", self.text_font, WHITE),
+            ("", self.text_font, WHITE)
         ]
         
         gif_path = 'src/scenes/gifs/chika-chika-dance.gif'
@@ -177,20 +170,17 @@ class CreditsScene:
             self.button_font
         )
         
-        # Configurações de animação
-        self.scroll_speed = 30  # pixels por segundo
+        self.scroll_speed = 50
         self.start_y = screen_height + 50
         self.current_y = self.start_y
         self.final_y = -len(self.credits_texts) * 50 - 100
         
-        # Estado da animação
         self.is_scrolling = True
         self.scroll_pause_time = 0
-        self.scroll_pause_duration = 3.0  # pausa por 3 segundos no final
+        self.scroll_pause_duration = 2.0
         
-        # Timer para auto-retorno ao menu (instantâneo)
         self.auto_return_timer = 0
-        self.auto_return_duration = 0.1  # Voltar ao menu quase instantaneamente
+        self.auto_return_duration = 0.1
         self.has_finished_scrolling = False
         
     def handle_key_press(self, key):
@@ -208,31 +198,25 @@ class CreditsScene:
     def update(self, dt):
         self.back_button.update(dt)
         
-        # Atualizar GIF da Chika
         self.chika_gif.update(dt)
         
-        # Atualizar hover do botão
         mouse_pos = pygame.mouse.get_pos()
         self.back_button.check_hover(mouse_pos)
         
-        # Animação de scroll dos créditos
         if self.is_scrolling:
             self.current_y -= self.scroll_speed * dt
             
-            # Verificar se chegou ao final
             if self.current_y <= self.final_y:
                 self.current_y = self.final_y
                 self.is_scrolling = False
                 self.scroll_pause_time = 0
                 self.has_finished_scrolling = True
         else:
-            # Pausar no final antes de mostrar o botão
             self.scroll_pause_time += dt
             if self.scroll_pause_time >= self.scroll_pause_duration:
                 self.is_scrolling = True
                 self.current_y = self.start_y
         
-        # Auto-retorno ao menu após um tempo (instantâneo)
         if self.has_finished_scrolling and not self.is_scrolling:
             self.auto_return_timer += dt
             if self.auto_return_timer >= self.auto_return_duration:
@@ -241,41 +225,34 @@ class CreditsScene:
         return None
     
     def draw(self, surface):
-        # Desenhar background
         surface.blit(self.background, (0, 0))
         
-        # Overlay escuro
         overlay = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 120))
         surface.blit(overlay, (0, 0))
         
-        # Desenhar textos dos créditos
         y_offset = self.current_y
         for i, (text, font, color) in enumerate(self.credits_texts):
-            if text:  # Só desenhar se não for linha vazia
-                # Sombra do texto
+            if text: 
+
                 text_shadow = font.render(text, True, BLACK)
                 shadow_rect = text_shadow.get_rect(center=(self.screen_width // 2 + 2, y_offset + 2))
                 surface.blit(text_shadow, shadow_rect)
                 
-                # Texto principal
                 text_surface = font.render(text, True, color)
                 text_rect = text_surface.get_rect(center=(self.screen_width // 2, y_offset))
                 surface.blit(text_surface, text_rect)
             
-            # Desenhar GIF da Chika após o último texto
             if i == len(self.credits_texts) - 1 and self.chika_gif.loaded:
                 gif_y = y_offset + 30
-                gif_x = self.screen_width // 2 - 125  # Centralizar o GIF (250px de largura)
+                gif_x = self.screen_width // 2 - 125
                 self.chika_gif.draw(surface, gif_x, gif_y)
             
             y_offset += 50
-        
-        # Desenhar botão de voltar apenas quando a animação terminar
+
         if not self.is_scrolling and self.scroll_pause_time >= self.scroll_pause_duration:
             self.back_button.draw(surface)
             
-            # Instrução para voltar
             instruction_text = self.text_font.render("Pressione ESPAÇO ou clique em VOLTAR", True, WHITE)
             instruction_shadow = self.text_font.render("Pressione ESPAÇO ou clique em VOLTAR", True, BLACK)
             
@@ -285,7 +262,6 @@ class CreditsScene:
             surface.blit(instruction_shadow, shadow_rect)
             surface.blit(instruction_text, instruction_rect)
             
-            # Mostrar contador de auto-retorno
             if self.has_finished_scrolling:
                 remaining_time = max(0, self.auto_return_duration - self.auto_return_timer)
                 countdown_text = f"Voltando ao menu em {remaining_time:.1f}s"
