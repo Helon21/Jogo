@@ -128,7 +128,7 @@ class ScoreHistoryScene:
         list_y = 120
         
         stats = self.score_manager.get_stats()
-        stats_text = f"Total: {stats['total_scores']} | Melhor: {stats['best_score']:,} | Média: {stats['average_score']:,}"
+        stats_text = f"Total: {stats['total_scores']} | Melhor: {stats['best_score']:,}"
         stats_surface = self.text_font.render(stats_text, True, YELLOW)
         stats_rect = stats_surface.get_rect(center=(self.screen_width // 2, list_y - 11))
         surface.blit(stats_surface, stats_rect)
