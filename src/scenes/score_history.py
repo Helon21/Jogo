@@ -124,14 +124,14 @@ class ScoreHistoryScene:
         title_rect = title_text.get_rect(center=(self.screen_width // 2, 50))
         surface.blit(title_text, title_rect)
         
+        list_x = 100
+        list_y = 120
+        
         stats = self.score_manager.get_stats()
         stats_text = f"Total: {stats['total_scores']} | Melhor: {stats['best_score']:,} | Média: {stats['average_score']:,}"
         stats_surface = self.text_font.render(stats_text, True, YELLOW)
-        stats_rect = stats_surface.get_rect(center=(self.screen_width // 2, 90))
+        stats_rect = stats_surface.get_rect(center=(self.screen_width // 2, list_y - 11))
         surface.blit(stats_surface, stats_rect)
-        
-        list_x = 100
-        list_y = 120
         list_width = self.screen_width - 200
         list_height = self.screen_height - 250
         
@@ -141,12 +141,15 @@ class ScoreHistoryScene:
         
         header_y = list_y + 10
         headers = ["#", "JOGADOR", "MÚSICA", "PONTUAÇÃO", "DATA"]
-        header_widths = [50, 200, 250, 120, 120]
+        header_widths = [50, 200, 250, 150, 150]
         
+        # Calcular posições dos cabeçalhos
+        header_positions = []
         x_offset = list_x + 10
         for i, (header, width) in enumerate(zip(headers, header_widths)):
             header_text = self.header_font.render(header, True, WHITE)
             surface.blit(header_text, (x_offset, header_y))
+            header_positions.append(x_offset)
             x_offset += width
         
         separator_y = header_y + 25
@@ -163,22 +166,23 @@ class ScoreHistoryScene:
                     row_rect = pygame.Rect(list_x + 5, row_y - 2, list_width - 10, 22)
                     pygame.draw.rect(surface, (60, 60, 60), row_rect)
                 
+                # Usar as mesmas posições dos cabeçalhos para alinhar os dados
                 pos_text = self.text_font.render(f"{start_idx + i + 1}", True, WHITE)
-                surface.blit(pos_text, (list_x + 15, row_y))
+                surface.blit(pos_text, (header_positions[0] + 5, row_y))
                 
                 player_name = score['player_name'][:20] + "..." if len(score['player_name']) > 20 else score['player_name']
                 player_text = self.text_font.render(player_name, True, WHITE)
-                surface.blit(player_text, (list_x + 70, row_y))
+                surface.blit(player_text, (header_positions[1], row_y))
                 
                 song_name = score['song_name'][:25] + "..." if len(score['song_name']) > 25 else score['song_name']
                 song_text = self.text_font.render(song_name, True, WHITE)
-                surface.blit(song_text, (list_x + 280, row_y))
+                surface.blit(song_text, (header_positions[2], row_y))
                 
                 score_text = self.text_font.render(f"{score['score']:,}", True, YELLOW)
-                surface.blit(score_text, (list_x + 540, row_y))
+                surface.blit(score_text, (header_positions[3], row_y))
                 
                 date_text = self.text_font.render(score['date'], True, WHITE)
-                surface.blit(date_text, (list_x + 670, row_y))
+                surface.blit(date_text, (header_positions[4], row_y))
         else:
             no_scores_text = self.text_font.render("Nenhuma pontuação encontrada", True, WHITE)
             no_scores_rect = no_scores_text.get_rect(center=(self.screen_width // 2, list_y + list_height // 2))
