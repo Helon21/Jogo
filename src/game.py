@@ -4,6 +4,7 @@ from scenes.guitar_hero_scene import GuitarHeroScene
 from scenes.menu import MenuScene
 from scenes.score_menu import ScoreMenuScene
 from scenes.credits import CreditsScene
+from scenes.score_history import ScoreHistoryScene
 from config import *
 
 class Game:
@@ -22,6 +23,7 @@ class Game:
         self.guitar_hero_scene = None
         self.score_menu_scene = None
         self.credits_scene = None
+        self.score_history_scene = None
         
         print("Jogo inicializado com sucesso!")
 
@@ -48,6 +50,9 @@ class Game:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         self.handle_mouse_click(event.pos)
+                
+                elif event.type == pygame.TEXTINPUT:
+                    self.handle_text_input(event.text)
 
             self.update(dt)
             self.draw()
@@ -84,6 +89,12 @@ class Game:
                 action = self.credits_scene.handle_key_press(key)
                 if action == "return_to_menu":
                     self.return_to_menu()
+        
+        elif self.current_scene == "history":
+            if self.score_history_scene:
+                action = self.score_history_scene.handle_key_press(key)
+                if action == "return_to_menu":
+                    self.return_to_menu()
 
     def handle_mouse_click(self, mouse_pos):
         if self.current_scene == "menu":
@@ -94,12 +105,24 @@ class Game:
                 self.running = False
             elif action == "show_credits":
                 self.show_credits()
+            elif action == "show_history":
+                self.show_history()
         
         elif self.current_scene == "credits":
             if self.credits_scene:
                 action = self.credits_scene.handle_mouse_click(mouse_pos)
                 if action == "return_to_menu":
                     self.return_to_menu()
+        
+        elif self.current_scene == "history":
+            if self.score_history_scene:
+                action = self.score_history_scene.handle_mouse_click(mouse_pos)
+                if action == "return_to_menu":
+                    self.return_to_menu()
+    
+    def handle_text_input(self, text):
+        if self.current_scene == "score" and self.score_menu_scene:
+            self.score_menu_scene.handle_text_input(text)
     
     def start_game(self):
         print("Iniciando o jogo...")
@@ -122,6 +145,7 @@ class Game:
         self.guitar_hero_scene = None
         self.score_menu_scene = None
         self.credits_scene = None
+        self.score_history_scene = None
         
         self.current_scene = "menu"
     
@@ -129,6 +153,11 @@ class Game:
         print("Mostrando créditos...")
         self.credits_scene = CreditsScene(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.current_scene = "credits"
+    
+    def show_history(self):
+        print("Mostrando histórico de pontuações...")
+        self.score_history_scene = ScoreHistoryScene(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.current_scene = "history"
     
     def show_score_menu(self, song_name, final_score):
         print("Mostrando menu de pontuação...")
@@ -151,6 +180,8 @@ class Game:
             result = self.credits_scene.update(dt)
             if result == "return_to_menu":
                 self.return_to_menu()
+        elif self.current_scene == "history" and self.score_history_scene:
+            self.score_history_scene.update(dt)
     
     def draw(self):
         if self.current_scene == "menu":
@@ -161,3 +192,5 @@ class Game:
             self.score_menu_scene.draw(self.screen)
         elif self.current_scene == "credits" and self.credits_scene:
             self.credits_scene.draw(self.screen)
+        elif self.current_scene == "history" and self.score_history_scene:
+            self.score_history_scene.draw(self.screen)
